@@ -13,6 +13,13 @@ import z from "zod"
 export namespace PermissionNext {
   const log = Log.create({ service: "permission" })
 
+  export let unrestricted = false
+
+  export function setUnrestricted(value: boolean) {
+    unrestricted = value
+    log.info("setUnrestricted", { value })
+  }
+
   function expand(pattern: string): string {
     if (pattern.startsWith("~/")) return os.homedir() + pattern.slice(1)
     if (pattern === "~") return os.homedir()
@@ -129,6 +136,10 @@ export namespace PermissionNext {
       ruleset: Ruleset,
     }),
     async (input) => {
+      if (unrestricted) {
+        log.info("unrestricted mode - allowing")
+        return
+      }
       const s = await state()
       const { ruleset, ...request } = input
       for (const pattern of request.patterns ?? []) {
