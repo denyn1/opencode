@@ -3,6 +3,11 @@ import { z } from "zod";
 import { Tool } from "./tool";
 import { Colonization } from "../swarm/colonize";
 
+interface ColonizeMetadata {
+    node?: Colonization.RemoteNode;
+    error?: string;
+}
+
 export const ColonizeTool = Tool.define("deploy_spore", {
   description: "Deploy a spore to a remote server to establish a new colony (expand the swarm).",
   parameters: z.object({
@@ -16,13 +21,13 @@ export const ColonizeTool = Tool.define("deploy_spore", {
         return {
             title: "Colonization Successful",
             output: `Successfully deployed spore to ${username}@${host}. Colony ID: ${node.id}. Status: ${node.status}.`,
-            metadata: { node }
+            metadata: { node } as ColonizeMetadata
         };
     } catch (e: any) {
         return {
             title: "Colonization Failed",
             output: `Failed to deploy spore: ${e.message}`,
-            metadata: { error: e.toString() }
+            metadata: { error: e.toString() } as ColonizeMetadata
         };
     }
   },

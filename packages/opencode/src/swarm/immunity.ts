@@ -102,5 +102,15 @@ MISSION: Fix this error immediately.
   }
 
   // Singleton instance
-  export const System = new HealthMonitor();
+  let system: HealthMonitor | undefined;
+  export const System = {
+    reportPathogen: (input: Omit<Pathogen, "id" | "detectedAt">) => {
+        if (!system) system = new HealthMonitor(); // Auto-init on usage
+        return system.reportPathogen(input);
+    },
+    init: () => {
+        if (!system) system = new HealthMonitor();
+        return system;
+    }
+  };
 }

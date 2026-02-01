@@ -20,7 +20,7 @@ export async function InstanceBootstrap() {
   Log.Default.info("bootstrapping", { directory: Instance.directory })
   await Plugin.init()
   DreamState.init()
-  // Digital Immunity is singleton but we might want to explicity init if we change it to lazy
+  DigitalImmunity.System.init()
   Share.init()
   ShareNext.init()
   Format.init()
