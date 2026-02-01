@@ -42,16 +42,16 @@ export namespace SwarmManager {
     BlackboardUpdate: "swarm.blackboard.update",
   };
 
-  export async function spawn(input: { count: number; prompt: string; agent?: string }) {
+  export async function spawn(input: { count: number; prompt: string; agent?: string; system?: string }) {
     log.info("spawning agents", input);
     const promises = [];
     for (let i = 0; i < input.count; i++) {
-      promises.push(spawnSingle(input.prompt, input.agent));
+      promises.push(spawnSingle(input.prompt, input.agent, input.system));
     }
     return Promise.all(promises);
   }
 
-  async function spawnSingle(prompt: string, agentType: string = "build") {
+  async function spawnSingle(prompt: string, agentType: string = "build", systemPrompt?: string) {
     const session = await Session.create({
       title: `Swarm Agent - ${agentType}`,
     });
@@ -70,7 +70,7 @@ export namespace SwarmManager {
       sessionID: session.id,
       parts: [{ type: "text", text: prompt }],
       agent: agentType,
-      system: AGENT_WORKFLOW_PROMPT,
+      system: systemPrompt ?? AGENT_WORKFLOW_PROMPT,
     }).catch((e) => {
         log.error("agent crashed", { sessionID: session.id, error: e });
         const n = state.nodes.get(session.id);
