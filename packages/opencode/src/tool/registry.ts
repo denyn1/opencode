@@ -28,6 +28,8 @@ import { Truncate } from "./truncation"
 import { PlanExitTool, PlanEnterTool } from "./plan"
 import { ApplyPatchTool } from "./apply_patch"
 import { ReadBlackboardTool, WriteBlackboardTool } from "./swarm"
+import { CreateToolTool } from "./dynamic"
+import { RememberTool, RecallTool } from "./memory"
 
 export namespace ToolRegistry {
   const log = Log.create({ service: "tool.registry" })
@@ -121,6 +123,9 @@ export namespace ToolRegistry {
       ...(Flag.OPENCODE_EXPERIMENTAL_PLAN_MODE && Flag.OPENCODE_CLIENT === "cli" ? [PlanExitTool, PlanEnterTool] : []),
       ReadBlackboardTool,
       WriteBlackboardTool,
+      CreateToolTool,
+      RememberTool,
+      RecallTool,
       ...custom,
     ]
   }

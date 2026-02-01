@@ -4,6 +4,8 @@ import { SwarmManager } from "../../swarm/manager"
 import { PermissionNext } from "../../permission/next"
 import { z } from "zod"
 import { validator } from "hono-openapi"
+import { HiveMemory } from "../../swarm/memory"
+import { ToolRegistry } from "../../tool/registry"
 
 export const SwarmRoutes = () => {
   const app = new Hono()
@@ -46,6 +48,17 @@ export const SwarmRoutes = () => {
       nodes: SwarmManager.list(),
       blackboard: SwarmManager.getBlackboard(),
     })
+  })
+
+  app.get("/api/memory", async (c) => {
+    // List all memories (simple implementation)
+    const memories = await HiveMemory.recall("");
+    return c.json({ memories })
+  })
+
+  app.get("/api/tools", async (c) => {
+    const ids = await ToolRegistry.ids()
+    return c.json({ tools: ids })
   })
 
   app.get("/", async (c) => {
@@ -132,6 +145,26 @@ export const SwarmRoutes = () => {
             padding: 1rem;
             overflow: auto;
         }
+        .tabs {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+        .tab {
+            background: #334155;
+            padding: 0.5rem 1rem;
+            border-radius: 0.25rem;
+            cursor: pointer;
+        }
+        .tab.active {
+            background: var(--primary);
+        }
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+        .memory-item {
+            border-bottom: 1px solid #334155;
+            padding: 0.5rem 0;
+        }
     </style>
 </head>
 <body>
@@ -144,39 +177,73 @@ export const SwarmRoutes = () => {
             </div>
         </header>
 
-        <div class="card">
-            <h2>Spawn Agents</h2>
-            <div style="display: flex; gap: 1rem;">
-                <div style="flex: 1;">
-                    <label>Agent Count</label>
-                    <input type="number" id="spawn-count" value="5" min="1" max="10000">
+        <div class="tabs">
+            <div class="tab active" onclick="showTab('control')">Control</div>
+            <div class="tab" onclick="showTab('memory')">Hive Mind</div>
+            <div class="tab" onclick="showTab('tools')">Dynamic Tools</div>
+        </div>
+
+        <div id="control" class="tab-content active">
+            <div class="card">
+                <h2>Spawn Agents</h2>
+                <div style="display: flex; gap: 1rem;">
+                    <div style="flex: 1;">
+                        <label>Agent Count</label>
+                        <input type="number" id="spawn-count" value="5" min="1" max="10000">
+                    </div>
+                    <div style="flex: 1;">
+                        <label>Agent Type</label>
+                        <select id="spawn-type">
+                            <option value="build">Build</option>
+                            <option value="plan">Plan</option>
+                            <option value="explore">Explore</option>
+                        </select>
+                    </div>
                 </div>
-                <div style="flex: 1;">
-                    <label>Agent Type</label>
-                    <select id="spawn-type">
-                        <option value="build">Build</option>
-                        <option value="plan">Plan</option>
-                        <option value="explore">Explore</option>
-                    </select>
-                </div>
+                <label>Mission Prompt</label>
+                <textarea id="spawn-prompt" rows="3" placeholder="Enter task for the swarm..."></textarea>
+                <button onclick="spawn()">Deploy Swarm</button>
             </div>
-            <label>Mission Prompt</label>
-            <textarea id="spawn-prompt" rows="3" placeholder="Enter task for the swarm..."></textarea>
-            <button onclick="spawn()">Deploy Swarm</button>
+
+            <div class="card">
+                <h2>Blackboard (Shared Memory)</h2>
+                <pre id="blackboard">{}</pre>
+            </div>
+
+            <div class="grid" id="nodes-grid">
+                <!-- Nodes will be injected here -->
+            </div>
         </div>
 
-        <div class="card">
-            <h2>Blackboard (Shared Memory)</h2>
-            <pre id="blackboard">{}</pre>
+        <div id="memory" class="tab-content">
+            <div class="card">
+                <h2>Hive Mind Knowledge Base</h2>
+                <button onclick="fetchMemory()">Refresh Memory</button>
+                <div id="memory-list"></div>
+            </div>
         </div>
 
-        <div class="grid" id="nodes-grid">
-            <!-- Nodes will be injected here -->
+        <div id="tools" class="tab-content">
+            <div class="card">
+                <h2>Available Tools</h2>
+                <button onclick="fetchTools()">Refresh Tools</button>
+                <ul id="tools-list"></ul>
+            </div>
         </div>
     </div>
 
     <script>
         const API_BASE = '/swarm/api';
+
+        function showTab(id) {
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('.tab').forEach(el => el.classList.remove('active'));
+            document.getElementById(id).classList.add('active');
+            event.target.classList.add('active');
+
+            if (id === 'memory') fetchMemory();
+            if (id === 'tools') fetchTools();
+        }
 
         async function fetchStatus() {
             try {
@@ -199,6 +266,27 @@ export const SwarmRoutes = () => {
             } catch (e) {
                 console.error("Failed to fetch status", e);
             }
+        }
+
+        async function fetchMemory() {
+            const res = await fetch(API_BASE + '/memory');
+            const data = await res.json();
+            const list = document.getElementById('memory-list');
+            list.innerHTML = data.memories.map(m => \`
+                <div class="memory-item">
+                    <strong>\${m.topic}</strong> (ID: \${m.id})<br>
+                    <small>By: \${m.author || 'Unknown'} | \${new Date(m.timestamp).toLocaleString()}</small>
+                    <p>\${m.content}</p>
+                    <div>\${(m.tags || []).map(t => \`<span style="background:#475569;padding:2px 6px;border-radius:4px;font-size:0.8em;margin-right:4px;">\${t}</span>\`).join('')}</div>
+                </div>
+            \`).join('');
+        }
+
+        async function fetchTools() {
+            const res = await fetch(API_BASE + '/tools');
+            const data = await res.json();
+            const list = document.getElementById('tools-list');
+            list.innerHTML = data.tools.map(t => \`<li>\${t}</li>\`).join('');
         }
 
         async function toggleMode(e) {
@@ -228,8 +316,10 @@ export const SwarmRoutes = () => {
 
         document.getElementById('mode-toggle').addEventListener('change', toggleMode);
 
-        // Poll for updates
-        setInterval(fetchStatus, 2000);
+        // Poll for updates if control tab is active
+        setInterval(() => {
+            if (document.getElementById('control').classList.contains('active')) fetchStatus();
+        }, 2000);
         fetchStatus();
     </script>
 </body>
