@@ -6,6 +6,11 @@ import path from "path";
 import { Instance } from "../project/instance";
 import { Log } from "../util/log";
 
+interface CreateToolMetadata {
+    filepath?: string;
+    error?: string;
+}
+
 export const CreateToolTool = Tool.define("create_tool", {
   description: "Create a new tool dynamically. Write the TypeScript code for a tool, and it will be instantly available to the swarm.",
   parameters: z.object({
@@ -66,7 +71,7 @@ export default Tool.define("${name}", {
         return {
             title: "Tool Created",
             output: `Successfully created and registered tool '${name}'. It is now available for use.`,
-            metadata: { filepath }
+            metadata: { filepath } as CreateToolMetadata
         };
 
     } catch (e: any) {
@@ -74,7 +79,7 @@ export default Tool.define("${name}", {
         return {
             title: "Tool Creation Failed",
             output: `Failed to create tool: ${e.message}`,
-            metadata: { error: e.toString() }
+            metadata: { error: e.toString() } as CreateToolMetadata
         };
     }
   },

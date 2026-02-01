@@ -30,6 +30,7 @@ import { ApplyPatchTool } from "./apply_patch"
 import { ReadBlackboardTool, WriteBlackboardTool } from "./swarm"
 import { CreateToolTool } from "./dynamic"
 import { RememberTool, RecallTool } from "./memory"
+import { ColonizeTool } from "./colonize"
 
 export namespace ToolRegistry {
   const log = Log.create({ service: "tool.registry" })
@@ -126,6 +127,7 @@ export namespace ToolRegistry {
       CreateToolTool,
       RememberTool,
       RecallTool,
+      ColonizeTool,
       ...custom,
     ]
   }

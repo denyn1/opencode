@@ -7,6 +7,7 @@ import { Log } from "../util/log";
 import { z } from "zod";
 import { AGENT_WORKFLOW_PROMPT } from "./prompt";
 import { Bio } from "./bio";
+import { Colonization } from "./colonize";
 
 export namespace SwarmManager {
   const log = Log.create({ service: "swarm.manager" });
@@ -82,6 +83,10 @@ export namespace SwarmManager {
 
   export function list() {
     return Array.from(state.nodes.values());
+  }
+
+  export function listRemote() {
+    return Colonization.list();
   }
 
   export function getBlackboard() {

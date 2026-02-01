@@ -46,6 +46,7 @@ export const SwarmRoutes = () => {
     return c.json({
       unrestricted: PermissionNext.unrestricted,
       nodes: SwarmManager.list(),
+      colonies: SwarmManager.listRemote(),
       blackboard: SwarmManager.getBlackboard(),
       heart: { beat: 0, bpm: 60 }, // In real app, expose SwarmManager.getHeart().beat
     })
@@ -182,6 +183,7 @@ export const SwarmRoutes = () => {
             <div class="tab active" onclick="showTab('control')">Control</div>
             <div class="tab" onclick="showTab('memory')">Hive Mind</div>
             <div class="tab" onclick="showTab('tools')">Dynamic Tools</div>
+            <div class="tab" onclick="showTab('colonies')">Colonies</div>
             <div class="tab" style="margin-left: auto; background: none; cursor: default;">❤️ <span id="heartbeat">--</span> BPM</div>
         </div>
 
@@ -232,6 +234,13 @@ export const SwarmRoutes = () => {
                 <ul id="tools-list"></ul>
             </div>
         </div>
+
+        <div id="colonies" class="tab-content">
+            <div class="card">
+                <h2>Remote Colonies</h2>
+                <div id="colonies-list">No colonies established.</div>
+            </div>
+        </div>
     </div>
 
     <script>
@@ -264,6 +273,16 @@ export const SwarmRoutes = () => {
                         <div>Active: \${new Date(node.lastActive).toLocaleTimeString()}</div>
                     </div>
                 \`).join('');
+
+                const colList = document.getElementById('colonies-list');
+                if (data.colonies && data.colonies.length > 0) {
+                    colList.innerHTML = data.colonies.map(col => \`
+                        <div class="memory-item">
+                            <strong>\${col.username}@\${col.host}</strong> [\${col.status}] (ID: \${col.id})<br>
+                            <small>Last Contact: \${new Date(col.lastContact).toLocaleString()}</small>
+                        </div>
+                    \`).join('');
+                }
 
             } catch (e) {
                 console.error("Failed to fetch status", e);
