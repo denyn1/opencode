@@ -132,3 +132,20 @@ It's very similar to Claude Code in terms of capability. Here are the key differ
 ---
 
 **Join our community** [Discord](https://discord.gg/opencode) | [X.com](https://x.com/opencode)
+
+---
+
+## 🧬 Opencode v5: Digital Organism
+
+We have evolved. Opencode now features a biomimetic architecture including:
+- **Swarm Orchestration:** Manage up to 10,000 concurrent agents.
+- **Bio-Architecture:** Heartbeat synchronization, Sensory nervous system, and Predictive processing.
+- **Self-Preservation:** A Digital Immune System that auto-fixes bugs.
+- **Evolution:** Dynamic tool creation and offline "Dreaming" optimization.
+- **Colonization:** Self-replication to remote servers.
+
+### Accessing the Opencode OS
+
+After installing and running the server (`opencode serve`), navigate to `http://localhost:4096` to access the **Opencode OS Dashboard**—a fully immersive, macOS-style interface for managing the digital organism.
+
+[Read the full Architecture Docs](./docs/OPENCODE_V5_ARCH.md) | [Dokumentasi Bahasa Indonesia](./docs/OPENCODE_V5_ARCH.id.md)
