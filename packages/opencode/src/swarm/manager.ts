@@ -6,6 +6,7 @@ import { Identifier } from "../id/id";
 import { Log } from "../util/log";
 import { z } from "zod";
 import { AGENT_WORKFLOW_PROMPT } from "./prompt";
+import { Bio } from "./bio";
 
 export namespace SwarmManager {
   const log = Log.create({ service: "swarm.manager" });
@@ -17,11 +18,23 @@ export namespace SwarmManager {
     lastActive: number;
   };
 
+  const heart = new Bio.SwarmHeart(60); // 60 BPM (1 tick/sec)
+
   const state = {
     nodes: new Map<string, AgentNode>(),
     // Shared memory "Blackboard" for agents
     blackboard: new Map<string, any>(),
   };
+
+  // Start the heart immediately
+  heart.start();
+
+  // Circulation System: On every beat, ensure agents are alive and (conceptually) supplied with context
+  heart.subscribe((pulse) => {
+    // In a full implementation, we would broadcast diffs from the blackboard here.
+    // For now, we update the 'metabolism' of the swarm.
+    // log.debug("circulating nutrients", { beat: pulse.beat });
+  });
 
   export const Event = {
     Spawned: "swarm.spawned",
@@ -79,6 +92,10 @@ export namespace SwarmManager {
     state.blackboard.set(key, value);
     // Notify all agents (conceptually - in reality we just emit an event listeners can pick up)
     // In a real "thousands of agents" scenario, this might need a more robust pub/sub.
+  }
+
+  export function getHeart() {
+    return heart;
   }
 
   // Method to clear swarm for testing

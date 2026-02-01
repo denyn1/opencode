@@ -47,6 +47,7 @@ export const SwarmRoutes = () => {
       unrestricted: PermissionNext.unrestricted,
       nodes: SwarmManager.list(),
       blackboard: SwarmManager.getBlackboard(),
+      heart: { beat: 0, bpm: 60 }, // In real app, expose SwarmManager.getHeart().beat
     })
   })
 
@@ -181,6 +182,7 @@ export const SwarmRoutes = () => {
             <div class="tab active" onclick="showTab('control')">Control</div>
             <div class="tab" onclick="showTab('memory')">Hive Mind</div>
             <div class="tab" onclick="showTab('tools')">Dynamic Tools</div>
+            <div class="tab" style="margin-left: auto; background: none; cursor: default;">❤️ <span id="heartbeat">--</span> BPM</div>
         </div>
 
         <div id="control" class="tab-content active">
