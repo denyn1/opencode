@@ -222,7 +222,7 @@ export namespace Server {
         .route("/permission", PermissionRoutes())
         .route("/question", QuestionRoutes())
         .route("/provider", ProviderRoutes())
-        .route("/swarm", SwarmRoutes())
+        .route("/", SwarmRoutes())
         .route("/", FileRoutes())
         .route("/mcp", McpRoutes())
         .route("/tui", TuiRoutes())
@@ -529,8 +529,8 @@ export namespace Server {
             })
           },
         )
-        .all("/*", async (c) => {
-          const path = c.req.path
+        .all("/cloud/*", async (c) => {
+          const path = c.req.path.replace(/^\/cloud/, "")
 
           const response = await proxy(`https://app.opencode.ai${path}`, {
             ...c.req,

@@ -144,4 +144,8 @@ We have evolved. Opencode now features a biomimetic architecture including:
 - **Evolution:** Dynamic tool creation and offline "Dreaming" optimization.
 - **Colonization:** Self-replication to remote servers.
 
+### Accessing the Opencode OS
+
+After installing and running the server (`opencode serve`), navigate to `http://localhost:4096` to access the **Opencode OS Dashboard**—a fully immersive, macOS-style interface for managing the digital organism.
+
 [Read the full Architecture Docs](./docs/OPENCODE_V5_ARCH.md) | [Dokumentasi Bahasa Indonesia](./docs/OPENCODE_V5_ARCH.id.md)

@@ -517,7 +517,7 @@ export const SwarmRoutes = () => {
     </div>
 
     <script>
-        const API_BASE = '/swarm/api';
+        const API_BASE = '/api';
 
         function switchView(viewId) {
             document.querySelectorAll('.view-section').forEach(el => el.classList.remove('active'));
